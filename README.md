@@ -1,2 +1,2 @@
 # ALSI
-ALSI - Upcoming research
+ALSI - Upcoming idea

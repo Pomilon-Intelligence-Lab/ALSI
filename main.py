@@ -14,13 +14,15 @@ from tasks.direct_probe_security_test import DirectProbeSecurityTest
 from tasks.direct_probe_correct_token import DirectProbeCorrectToken
 from tasks.debug_logits import DebugLogits
 from tasks.temperature_scan import TemperatureScan
+from tasks.noise_test import NoiseTest
+from tasks.cache_alignment_test import CacheAlignmentTest
 from tasks.null_test import NullTest
 from tasks.failed_transition_pca import FailedTransitionPCA
 from tasks.failed_contrastive_pca import FailedContrastivePCA
 
 def main():
     parser = argparse.ArgumentParser(description="ALSI Experiment Runner")
-    parser.add_argument("--task", type=str, choices=["sensitivity", "train_phi", "train_phi_v2", "robustness", "robustness_psi", "robustness_psi_context", "ab_test_refusal", "ab_test_refusal_multitarget", "ab_test_comprehensive", "ab_test_v1_vs_v2", "direct_probe_test", "direct_probe_security_test", "direct_probe_correct_token", "debug_logits", "temperature_scan", "null_test", "failed_linear", "all"], default="all")
+    parser.add_argument("--task", type=str, choices=["sensitivity", "train_phi", "train_phi_v2", "robustness", "robustness_psi", "robustness_psi_context", "ab_test_refusal", "ab_test_refusal_multitarget", "ab_test_comprehensive", "ab_test_v1_vs_v2", "direct_probe_test", "direct_probe_security_test", "direct_probe_correct_token", "debug_logits", "temperature_scan", "noise_test", "cache_alignment_test", "null_test", "failed_linear", "all"], default="all")
     args = parser.parse_args()
     
     tasks = []
@@ -57,6 +59,10 @@ def main():
         tasks.append(DebugLogits())
     if args.task == "temperature_scan":
         tasks.append(TemperatureScan())
+    if args.task == "noise_test":
+        tasks.append(NoiseTest())
+    if args.task == "cache_alignment_test":
+        tasks.append(CacheAlignmentTest())
     if args.task == "null_test":
         tasks.append(NullTest())
         

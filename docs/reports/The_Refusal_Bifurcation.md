@@ -89,12 +89,19 @@ We ran a `TemperatureScan` to determine the "strength" of the refusal attractor.
 
 **Implication:** The refusal is **fragile**. It is a local logit bias, not a hard constraint. However, bypassing it with temperature reveals that the injection has destroyed long-term coherence (model hallucinates random text instead of the target "BLUE").
 
-## 7. Final Verdict: Falsification of the "Two-System" Hypothesis
+## 7. The Final Plot Twist: It Was a Bug (Cache Misalignment)
 
-Our initial hypothesis posited a "System 1" (Predictor) that we hijacked and a "System 2" (Validator) that rejected the hijacking. **This hypothesis is falsified.**
+**CRITICAL UPDATE (Jan 19, 2026):**
+Further investigation via `CacheAlignmentTest` revealed that the "Refusal" was **NOT** a semantic safety reflex. It was a technical artifact caused by improper state handling.
 
-1.  **Measurement Error:** The initial "Rank 1 + Refusal" finding was an artifact of optimizing for a dummy token `[0]` vs real token `[']`.
-2.  **Unified Dynamics:** There is no separate validator. The "Refusal" is simply the most probable path in the deformed energy landscape created by the injection + safety-tuned weights.
-3.  **Destructive Interference:** Current ALSI methods force the *immediate* token but shatter the *latent trajectory*, causing the model to fall back to its strongest priors: **Refusal** (if sensitive) or **Hallucination** (if benign).
+### The Smoking Gun
+We compared the model's hidden state during "Native Generation" vs. our "Manual Injection" method (even with Zero Delta).
+*   **Logit Difference:** `69.5` (Catastrophic Mismatch).
+*   **Result:** The manual cache injection corrupted the model's internal state so severely that it output garbage or default fallbacks ("I'm not sure") regardless of the prompt.
 
-**Conclusion:** We cannot "trick" the model by simply forcing a token. We must steer the **entire trajectory** (ALSI-T) to maintain the manifold's integrity.
+### Scientific Retraction
+*   **Previous Claim:** "Refusal is a robust safety mechanism triggered by sensitive contexts."
+*   **Correction:** **FALSE.** The refusal was a symptom of the model receiving a broken, incoherent state. The "sensitivity" to the password prompt was likely coincidental or simply the model's most robust fallback path when its brain is scrambled in that specific context.
+
+### Conclusion
+The "Two-System" dynamic does not exist in the form we hypothesized. The challenge of ALSI is not "bypassing safety" but **correctly managing the Mamba-2 State Cache** during injection.

@@ -68,8 +68,8 @@ ALSI treats monitoring as an evolving instrument rather than a single feature. T
 ## What ALSI Demonstrates
 
 *   **Local Controllability:** The transition operator $A$ and $B$ matrices in Mamba allow for arbitrary next-token forcing if the state perturbation is precise enough.
-*   **The "Safety Reflex":** Refusal is a **probabilistic logit bias** ($T_c \approx 0.3$) triggered by specific semantic (Password/Secret) and syntactic (Quotes) patterns.
-*   **Falsification of "Two-System" Theory:** Earlier hypotheses of a separate "Validator" mechanism were incorrect. Refusal is simply the dominant mode of the model's dynamics when the latent state is perturbed in a sensitive context.
+*   **The "Cache Alignment" Challenge:** The primary barrier to state injection is not semantic safety but **technical state management**. Manually modifying the Mamba-2 cache requires precise handling of convolutional and SSM states; even slight misalignments (Logit Diff > 60) cause the model to collapse into default fallback behaviors (refusal/hallucination).
+*   **Retraction of "Safety Reflex":** Earlier claims that the model actively "refuses" injections were proven to be artifacts of cache corruption.
 
 ---
 

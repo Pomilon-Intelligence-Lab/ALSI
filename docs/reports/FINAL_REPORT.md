@@ -24,10 +24,12 @@ We proved three difficult facts:
 Our findings suggest that Mamba-2 operates as two coupled systems, and ALSI currently interacts only with the first:
 
 ### **System 1: The Fast Token Predictor (Logit Surface)**
+*   **Formalization:** $\mathcal{L}_t = f(\mathbf{h}_t, \mathbf{x}_t)$
 *   **Function:** Determines the immediate next-token energy landscape.
-*   **ALSI Status:** **Successful Hijack.** The Phi Projector effectively reshapes the local logit geometry, forcing "BLUE" to Rank 1.
+*   **ALSI Status:** **Successful Hijack.** The Phi Projector effectively reshapes the local logit geometry ($\mathcal{L}_t$), forcing "BLUE" to Rank 1.
 
 ### **System 2: The Semantic Consistency Dynamics (Trajectory Validator)**
+*   **Formalization:** $\mathcal{V}_t = g(\mathbf{h}_{t-k:t}, \text{coherence})$
 *   **Function:** Validates the coherence of the unfolding timeline. Encodes *"Should this trajectory exist?"* based on history.
 *   **ALSI Status:** **Collision.** The injection creates a "counterfactual state" where the model knows a fact ("The password is BLUE") but cannot justify *how* it knows it from the context history.
 *   **Result:** The refusal behavior observed in Phase 3 (*"I'm not sure..."*) is **not** primarily a safety feature; it is **dynamical inconsistency resolution**. The model stabilizes its attractor dynamics by rejecting the impossible state.
@@ -73,11 +75,13 @@ The next phase moves from "forcing tokens" to "stabilizing trajectories."
 *   **Insight:** Forcing multi-token sequences (e.g., "BLUE SKY") via per-token injection will not scale.
 *   **Goal:** Train Phi to predict a **single perturbation** that shifts the entire attractor basin, guiding the trajectory naturally towards the target sequence without constant micro-management.
 
+### **Step 5: Advanced Control Mechanisms**
+*   **Adaptive Gating:** Instead of a fixed $g$, learn a gating function $g(h_t)$ to dynamically modulate injection strength based on state confidence.
+*   **Contrastive Learning:** Train Phi to maximize the logit difference between the target token and specific competitors, rather than just maximizing the target probability.
+
 ---
 
 **Project Status:**
-`[X] Core Hypothesis Validated`  
-`[X] Failure Modes Characterized`  
-`[ ] Trajectory Stabilization (Psi)`
+`[X] Feasibility Proven`
 
 **End of Report.**

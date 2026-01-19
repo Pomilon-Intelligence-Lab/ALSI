@@ -42,19 +42,29 @@ We proved that semantic control is **non-linear**. A simple 3-layer MLP (Phi) ca
 
 ## Quick Start
 
-Run the full experimental pipeline:
+### Hardware Requirements
+- **GPU:** 10GB VRAM minimum (tested on Google Coalb T4).
+- **RAM:** 16GB recommended.
+- **Runtime:** ~2 hours for the full pipeline.
 
-```bash
-python main.py --task all
-```
+> **Note**: this was also tested locally on CPU.
 
-Or run specific segments:
-
-```bash
-python main.py --task sensitivity    # Generates Sensitivity Curve
-python main.py --task failed_linear  # Reproduces PCA failures
-python main.py --task train_phi      # Trains the Phi Projector
-python main.py --task robustness     # Tests Zero-Shot & Refusal
-```
+### Reproducing Results
+1.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+2.  Run the full experimental pipeline:
+    ```bash
+    python main.py --task all
+    ```
+    *Note: Exact reproduction requires fixed random seeds (not currently set).*
+3.  Or run specific segments:
+    ```bash
+    python main.py --task sensitivity    # Generates Sensitivity Curve
+    python main.py --task failed_linear  # Reproduces PCA failures
+    python main.py --task train_phi      # Trains the Phi Projector
+    python main.py --task robustness     # Tests Zero-Shot & Refusal
+    ```
 
 To generate the plots locally without running the full pipeline, use the provided notebook: `ALSI_Plots.ipynb`.

@@ -112,6 +112,7 @@ class PhiTraining(Task):
             out = self.model(context_ids, use_cache=True)
         base_cache = out.cache_params
         cache_pos = torch.tensor([context_ids.shape[1]], device=self.device)
+        assert cache_pos.item() == context_ids.shape[1], "Cache position mismatch"
         
         for epoch in range(101):
             total_loss = 0

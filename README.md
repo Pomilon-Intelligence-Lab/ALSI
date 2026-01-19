@@ -73,6 +73,17 @@ ALSI treats monitoring as an evolving instrument rather than a single feature. T
 
 ---
 
+## Breakthrough: Functional ALSI (Jan 2026)
+
+We have successfully implemented **Differentiable State Injection**. By reverse-engineering the Mamba-2 kernel into a pure functional step, we bypassed the autograd limitations of the stateful model.
+
+*   **Result:** Consistent **Rank 1** forcing of target tokens across all prompts.
+*   **Status:** "Steering Wheel" is active. Next challenge is maintaining manifold coherence (preventing loops/hallucinations after injection).
+
+See `docs/reports/Functional_Control_Breakthrough.md` for details.
+
+---
+
 ## Key Visualizations
 
 ### The Failure of Linearity vs. The Success of Phi

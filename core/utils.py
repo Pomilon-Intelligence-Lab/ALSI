@@ -10,12 +10,21 @@ class MockCache:
         self.conv_states = conv_states
         self.config = config
         self.conv_kernel_size = config.conv_kernel
-        # Mamba2Cache attributes
-        self.seq_len_offset = 0
+        
+        # Mamba2Cache attributes for kernel dispatch/equivalence
+        self.n_groups = config.n_groups if hasattr(config, 'n_groups') else 1
+        self.state_size = config.state_size
+        self.head_dim = config.head_dim
+        self.num_heads = config.num_heads
+        # Mamba2 uses hidden_size * expand for intermediate_size
+        self.intermediate_size = config.hidden_size * config.expand
         self.dtype = ssm_states.dtype
+        self.seq_len_offset = 0 # Dummy for compatibility
+
+    def reset(self):
+        pass
 
     def update_ssm_state(self, layer_idx, new_ssm_state, cache_init=False):
-        # We generally don't want side effects during optimization/probing
         pass
 
     def update_conv_state(self, layer_idx, new_conv_state, cache_init=False):

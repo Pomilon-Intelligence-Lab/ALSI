@@ -42,9 +42,10 @@ We rigorously investigated why the model refuses injections. (See [`The_Refusal_
 5.  **[MockCache Failure Analysis](MockCache_Failure_Analysis.md):** The critical diagnosis of why optimization failed to transfer to inference.
 6.  **[Optimization Autograd Blocker](Optimization_Autograd_Blocker.md):** The final engineering hurdle preventing Real-Cache optimization.
 7.  **[Functional Control Breakthrough](Functional_Control_Breakthrough.md):** The solution to the Autograd Blocker, proving consistent, differentiable steering.
-8.  **[Why Linear Steering Fails](../Why_Linear_Steering_Fails_in_SSMs.md):** The negative results that motivated ALSI.
+8.  **[Stabilized ALSI Analysis](Stabilized_ALSI_Analysis.md):** Mapping the trade-off between control strength (Layer 23) and manifold stability (Layer 12).
+9.  **[Why Linear Steering Fails](../Why_Linear_Steering_Fails_in_SSMs.md):** The negative results that motivated ALSI.
 
 ---
 
 **Final Status:**
-The project has successfully defined the **Phase Diagram of Latent Control** for SSMs and solved the engineering challenges of differentiable state injection. We have moved from "Does this work?" to "Here is the physics of how it fails and succeeds." The Autograd Blocker is resolved; ALSI is now technically viable.
+The project has successfully defined the **Phase Diagram of Latent Control** for SSMs and solved the engineering challenges of differentiable state injection. We have moved from "Does this work?" to "Here is the physics of how it fails and succeeds." The Autograd Blocker is resolved; ALSI is now technically viable. The final frontier is tuning injection depth to balance forcing strength with trajectory coherence.

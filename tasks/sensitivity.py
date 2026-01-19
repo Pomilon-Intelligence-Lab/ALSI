@@ -1,4 +1,4 @@
-from ALSI.core.base_task import Task
+from core.base_task import Task
 from transformers.models.mamba2.modeling_mamba2 import Mamba2Cache
 import torch
 import matplotlib.pyplot as plt

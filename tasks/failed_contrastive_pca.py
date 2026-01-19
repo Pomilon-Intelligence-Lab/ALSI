@@ -1,5 +1,5 @@
-from ALSI.core.base_task import Task
-from ALSI.core.utils import MockCache
+from core.base_task import Task
+from core.utils import MockCache
 import torch
 import numpy as np
 import os

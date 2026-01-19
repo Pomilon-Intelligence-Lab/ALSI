@@ -45,16 +45,16 @@ We proved that semantic control is **non-linear**. A simple 3-layer MLP (Phi) ca
 Run the full experimental pipeline:
 
 ```bash
-python ALSI/main.py --task all
+python main.py --task all
 ```
 
 Or run specific segments:
 
 ```bash
-python ALSI/main.py --task sensitivity    # Generates Sensitivity Curve
-python ALSI/main.py --task failed_linear  # Reproduces PCA failures
-python ALSI/main.py --task train_phi      # Trains the Phi Projector
-python ALSI/main.py --task robustness     # Tests Zero-Shot & Refusal
+python main.py --task sensitivity    # Generates Sensitivity Curve
+python main.py --task failed_linear  # Reproduces PCA failures
+python main.py --task train_phi      # Trains the Phi Projector
+python main.py --task robustness     # Tests Zero-Shot & Refusal
 ```
 
 To generate the plots locally without running the full pipeline, use the provided notebook: `ALSI_Plots.ipynb`.

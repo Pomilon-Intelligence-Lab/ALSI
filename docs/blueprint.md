@@ -1,7 +1,7 @@
 # **Project Blueprint: Augmented Latent State Injection (ALSI)**
 
 Technical Alias: Recurrent Latent Caching (RLC)  
-Target Model: Mamba-2 (AntonV/mamba2-130m-av)
+Target Model: Mamba-2 (AntonV/mamba2-130m-hf)
 
 ## **1\. Executive Summary**
 

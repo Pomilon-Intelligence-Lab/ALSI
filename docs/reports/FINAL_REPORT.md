@@ -1,7 +1,7 @@
 # **ALSI Project: Final Technical Report (v2)**
 
 **Date:** January 18, 2026  
-**Target Model:** Mamba-2 (130m)  
+**Target Model:** Mamba-2 (130m) - (AntonV/mamba2-130m-hf)
 **Objective:** Validate "Augmented Latent State Injection" (ALSI) as a mechanism for deterministic semantic control of State Space Models via recurrent state grafting.
 
 ---

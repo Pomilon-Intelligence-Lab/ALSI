@@ -1,9 +1,9 @@
 import argparse
-from ALSI.tasks.sensitivity import SensitivityScan
-from ALSI.tasks.phi_training import PhiTraining
-from ALSI.tasks.robustness import RobustnessTest
-from ALSI.tasks.failed_transition_pca import FailedTransitionPCA
-from ALSI.tasks.failed_contrastive_pca import FailedContrastivePCA
+from tasks.sensitivity import SensitivityScan
+from tasks.phi_training import PhiTraining
+from tasks.robustness import RobustnessTest
+from tasks.failed_transition_pca import FailedTransitionPCA
+from tasks.failed_contrastive_pca import FailedContrastivePCA
 
 def main():
     parser = argparse.ArgumentParser(description="ALSI Experiment Runner")

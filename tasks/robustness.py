@@ -1,6 +1,6 @@
-from ALSI.core.base_task import Task
-from ALSI.core.phi import PhiProjector
-from ALSI.core.utils import MockCache
+from core.base_task import Task
+from core.phi import PhiProjector
+from core.utils import MockCache
 from transformers.models.mamba2.modeling_mamba2 import Mamba2Cache
 import torch
 import os

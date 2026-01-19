@@ -1,6 +1,6 @@
-from ALSI.core.base_task import Task
-from ALSI.core.phi import PhiProjector
-from ALSI.core.utils import MockCache
+from core.base_task import Task
+from core.phi import PhiProjector
+from core.utils import MockCache
 import torch
 import torch.nn as nn
 import torch.optim as optim

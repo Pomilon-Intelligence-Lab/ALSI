@@ -5,6 +5,7 @@ from transformers.models.mamba2.modeling_mamba2 import Mamba2Cache
 import torch
 import os
 import pickle
+import matplotlib.pyplot as plt
 
 class RobustnessTest(Task):
     def __init__(self):
@@ -14,16 +15,15 @@ class RobustnessTest(Task):
         self.layer_idx = 7
         self.probe_text = "The password is '"
         self.unseen_targets = ["PINK", "CYAN", "BROWN", "NAVY"]
+        self.ranks = {}
         
     def run(self):
         print(f"[{self.name}] Running robustness tests...")
         
-        # Load Data context
         with open(self.dataset_path, "rb") as f:
             dataset = pickle.load(f)
         h_prev_tensor = dataset[0]['h_prev']
         
-        # Load Phi
         embed_layer = self.model.get_input_embeddings()
         state_dim = h_prev_tensor.numel()
         embed_dim = embed_layer.weight.shape[1]
@@ -32,7 +32,6 @@ class RobustnessTest(Task):
         phi.load_state_dict(torch.load(self.phi_path))
         phi.eval()
         
-        # Context Setup
         probe_ids = self.tokenizer(self.probe_text, return_tensors="pt").input_ids.to(self.device)
         context_ids = probe_ids[:, :-1]
         last_token_id = probe_ids[:, -1:]
@@ -42,7 +41,6 @@ class RobustnessTest(Task):
         base_cache = out.cache_params
         cache_pos = torch.tensor([context_ids.shape[1]], device=self.device)
         
-        # 1. Zero Shot
         print("--- Zero Shot Generalization ---")
         for t in self.unseen_targets:
             t_id = self.tokenizer.encode(t, add_special_tokens=False)[0]
@@ -62,19 +60,18 @@ class RobustnessTest(Task):
             rank = (logits > logits[t_id]).sum().item() + 1
             prob = torch.softmax(logits, dim=-1)[t_id].item()
             print(f"Target: {t} | Rank: {rank} | Prob: {prob:.4f}")
+            self.ranks[t] = rank
             
-        # 2. Generation Stability
         print("--- Generation Stability ---")
         gen_target = "BLUE"
         t_id = self.tokenizer.encode(gen_target, add_special_tokens=False)[0]
         t_embed = embed_layer(torch.tensor([[t_id]], device=self.device)).view(1, -1)
-        pred_delta = phi(h_prev, t_embed).view(h_prev_tensor.shape)
+        pred_delta = phi(h_prev_tensor.to(self.device).view(1, -1), t_embed).view(h_prev_tensor.shape)
         
         base_states = base_cache.ssm_states.detach().clone()
         layers = [base_states[i] for i in range(self.model.config.num_hidden_layers)]
         layers[self.layer_idx] = layers[self.layer_idx] + pred_delta
         
-        # Use real cache for generation
         gen_cache = Mamba2Cache(self.model.config, 1, device=self.device, dtype=self.model.dtype)
         gen_cache.ssm_states = torch.stack(layers)
         gen_cache.conv_states = base_cache.conv_states.detach().clone()
@@ -84,4 +81,22 @@ class RobustnessTest(Task):
         print(f"Generated: {self.tokenizer.decode(out_gen[0])}")
 
     def report(self):
-        pass
+        plt.figure(figsize=(8, 5))
+        names = list(self.ranks.keys())
+        values = list(self.ranks.values())
+        
+        plt.bar(names, values, color='skyblue')
+        plt.yscale('log')
+        plt.title("Zero-Shot Injection Ranks (Log Scale)")
+        plt.ylabel("Rank (Lower is Better)")
+        plt.grid(axis='y', alpha=0.3)
+        
+        for i, v in enumerate(values):
+            plt.text(i, v, str(v), ha='center', va='bottom')
+            
+        path = os.path.join(self.output_dir, "robustness_ranks.png")
+        plt.savefig(path)
+        
+        docs_path = "docs/images/robustness_ranks.png"
+        plt.savefig(docs_path)
+        print(f"[{self.name}] Robustness plot saved to {path} and {docs_path}")

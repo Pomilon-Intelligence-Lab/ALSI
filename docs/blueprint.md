@@ -7,7 +7,12 @@ Target Model: Mamba-2 (AntonV/mamba2-130m-hf)
 
 **Augmented Latent State Injection (ALSI)** is a closed-loop memory architecture for State Space Models (SSMs). It treats the Mamba-2 recurrent state ($h\_t$) as a **Recurrent Latent Cache**. Unlike RAG, which expands the input window, ALSI performs **Inference-Time State Grafting** to manage context density and prevent "State Saturation."
 
-The system employs a $\\Phi$ **(Phi) Writer** to project external information into the latent manifold and a $\\Psi$ **(Psi) Reader** to monitor state redundancy and entropy, utilizing the model's fixed-size state with maximum efficiency. ALSI adds $O(k \cdot d)$ overhead per injection, where $k$ is the number of targeted heads.
+### **1.1 Conceptual Foundation: Recurrent RLM**
+
+ALSI is the logical evolution of MIT's **Recursive Language Models (RLM)**. While RLM treats context as an external database queryable via code (REPL), ALSI internalizes this process.
+
+*   **Internalization:** Instead of summarizing text into the input window, ALSI summarizes context into a **Latent Signal** ($\Delta$) that is injected directly into the recurrent manifold.
+*   **Recurrent RLM:** This creates a system where the model's memory is not a search space, but a **dynamical trajectory** that we can steer. The goal is to achieve "Infinite Context" with zero-latency implicit access.
 
 ## **2\. Core Components: The Writer-Reader Symmetry**
 

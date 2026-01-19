@@ -1,48 +1,94 @@
 # Augmented Latent State Injection (ALSI)
 
-This repository contains the implementation, experimental history, and final verification of the ALSI project. The goal was to determine if deterministic semantic control of Mamba-2 State Space Models is possible via direct recurrent state grafting.
+> [!CAUTION]
+> **Research Artifact Disclaimer**: This repository is a collection of research experiments and technical artifacts documenting a specific investigation into Mamba-2 state dynamics. It is **not** a production-ready framework, a stable product, or a library for general use. The methods, code, and conclusions contained herein are exploratory and provided as-is for scientific transparency.
 
-## Key Visualizations
+> **"Logit control ≠ trajectory control"**
 
-### 1. The Failure of Linearity (Sensitivity Scan)
-
-![Sensitivity Curve](docs/images/sensitivity_curve.png)
-*This plot demonstrates that naive, linear state mixing ($h_{new} = h_{old} + h_{fact}$) has almost no effect on the model's output across all 24 layers. The curve is flat/noisy, falsifying the hypothesis that semantic control is a simple linear addition.*
-
-### 2. The Cost of Control (Pareto Frontier)
-
-![Pareto Frontier](docs/images/pareto_frontier.png)
-*This plot shows the trade-off between the magnitude of the injected delta ($||\Delta h||$) and the success of the control (Cross Entropy Loss). Achieving low loss requires large, off-manifold deltas that are actively resisted by the model's natural dynamics.*
-
-### 3. Learning to Control (Phi Training)
-
-![Phi Training](docs/images/phi_training_curve.png)
-*The non-linear Phi Projector successfully minimizes the control loss, learning to map targets to the "Golden Delta".*
-
-### 4. Generalization Gap (Robustness)
-
-![Robustness](docs/images/robustness_ranks.png)
-*Phi generalizes to semantically close targets (e.g., PINK, Rank 4) but struggles with distant ones (e.g., CYAN, Rank 198), indicating non-uniform control surfaces.*
+This repository contains the experimental history and findings regarding the discovery of a non-linear control surface within Mamba-2 State Space Models. It serves as a narrative artifact that falsifies the assumption of linear state steering and explores a new primitive for "grafting" semantic intentions directly into the model's recurrent dynamics.
 
 ---
 
-## Technical Summary
+## The Question
 
-See `docs/reports/FINAL_REPORT.md` for the comprehensive research memo.
+**Can we deterministically control the output of a State Space Model (Mamba-2) by surgically modifying its recurrent state?**
 
-### 1. The "Two-System" Discovery
+Unlike Transformers, which have a queryable "residual stream" at every token, Mamba compresses history into a fixed-size state. We asked if we could calculate a `Delta` such that:
 
-Our experiments reveal that Mamba-2 operates as two coupled systems:
+$$ State_{new} = State_{old} + \Delta \rightarrow \text{Target Output} $$
 
-* **System 1 (Logit Surface):** A fast, locally steerable predictor. We successfully hijacked this using our **Phi Projector**, achieving **Rank 1** for target tokens.
-* **System 2 (Trajectory Validator):** A slow, semantic consistency check. This system "rejected" our injections in Phase 3, leading to the model generating refusal text ("I'm not sure...") despite predicting the target token correctly.
+## The Failed Assumptions
 
-### 2. Validated Architecture: The Phi Projector
+We initially hypothesized that semantic features (like "color") resided in linear subspaces, accessible via:
+1.  **Linear Addition:** `h_new = h_old + h_target` (Result: **Failed**, no sensitivity)
+2.  **Contrastive Steering:** `Delta = h_blue - h_red` (Result: **Failed**, zero logit movement)
+3.  **Natural Transition PCA:** Steering within the manifold of natural state updates (Result: **Failed**, rank did not improve)
 
-We proved that semantic control is **non-linear**. A simple 3-layer MLP (Phi) can learn to map `(State, Target)` $\rightarrow$ `Delta` to force specific outputs.
+See `docs/Why_Linear_Steering_Fails_in_SSMs.md` for the technical breakdown.
 
-* **Performance:** Rank 1-5 on training targets.
-* **Generalization:** Successfully steered unseen tokens (`PINK`) based on semantic proximity to training data.
+## The Discovery
+
+Semantic control in Mamba-2 is **non-linear** and **off-manifold**.
+
+*   **Golden Delta:** For any target token, there exists a specific, high-magnitude state perturbation that forces the model to output it (Loss < 0.02).
+*   **The Phi Projector:** This non-linear mapping is learnable. We trained a simple MLP ($\Phi$) that projects `(Current State, Target Token)` $\rightarrow$ `Golden Delta`.
+
+## The New Primitive
+
+ALSI is a framework for **State-Space Grafting**. It allows us to insert a semantic intention into the model's recurrent stream without seeing the full prompt context.
+
+---
+
+## Terminology
+
+To avoid confusion with "jailbreaking" or activation patching:
+
+*   **State Injection:** Operationally, we add a vector to the state. However, this is best understood as **Transient State Grafting**. We are not overwriting the model's memory; we are inserting a "phantom" transition that forces the dynamics to evolve towards a specific immediate future.
+*   **Phi ($\Phi$) Projector:** The trained MLP that calculates the necessary graft vector.
+*   **Psi ($\Psi$) Reader:** (Conceptual/Experimental) A stability monitor that detects when a graft forces the trajectory off-manifold, triggering refusal or collapse.
+
+---
+
+## The Psi Evolution Ladder
+
+ALSI treats monitoring as an evolving instrument rather than a single feature. The project progresses through three stages of $\Psi$:
+
+1.  **$\Psi$-B (Behavioral):** *[Current Implementation]* Detects trajectory rejection by monitoring output entropy and refusal patterns in generated text.
+2.  **$\Psi$-L (Latent):** *[Phase 4 Goal]* Detects instability inside the hidden state manifold (e.g., Cosine Similarity, KL Divergence vs. natural transitions) *before* tokens are sampled.
+3.  **$\Psi$-T (Trajectory):** *[Conceptual]* Closed-loop enforcement where $\Psi$ modulates the $\Phi$ injection strength in real-time to maintain state stability.
+
+---
+
+## What ALSI Is *Not*
+
+*   ❌ **Not Full Semantic Overwrite:** It does not erase the model's previous history.
+*   ❌ **Not Prompt Replacement:** It acts on the compressed state, not the input tokens.
+*   ❌ **Not Linear Interpretability:** It proves that semantic control directions are non-linear w.r.t. the natural state manifold.
+
+## What ALSI Demonstrates
+
+*   **Local Controllability:** The transition operator $A$ and $B$ matrices in Mamba allow for arbitrary next-token forcing if the state perturbation is precise enough.
+*   **The "Safety Reflex":** Refusal is a **probabilistic logit bias** ($T_c \approx 0.3$) triggered by specific semantic (Password/Secret) and syntactic (Quotes) patterns.
+*   **Falsification of "Two-System" Theory:** Earlier hypotheses of a separate "Validator" mechanism were incorrect. Refusal is simply the dominant mode of the model's dynamics when the latent state is perturbed in a sensitive context.
+
+---
+
+## Key Visualizations
+
+### The Failure of Linearity vs. The Success of Phi
+
+![Sensitivity Curve](docs/images/sensitivity_curve.png)
+*Naive linear addition (blue/flat) does nothing. The Phi Projector (learning curve, see full report) successfully finds the control surface.*
+
+### The Cost of Control
+
+![Pareto Frontier](docs/images/pareto_frontier.png)
+*Control requires high-energy deltas (Y-axis) that fight the model's natural compression (X-axis).*
+
+### Generalization & Refusal
+
+![Robustness](docs/images/robustness_ranks.png)
+*Phi generalizes to semantic neighbors (PINK) but distant targets (CYAN) remain hard to steer. Trajectory generation often reveals the model "rejecting" the graft.*
 
 ---
 
@@ -50,41 +96,25 @@ We proved that semantic control is **non-linear**. A simple 3-layer MLP (Phi) ca
 
 * `core/`: Shared infrastructure (Task base class, Phi model, Utils).
 * `tasks/`: Implementation of specific experiments.
-  * `sensitivity.py`: Phase 1 Layer-wise sensitivity scan.
   * `phi_training.py`: Phase 2 Ground truth generation and Phi Projector training.
-  * `robustness.py`: Phase 3 Zero-shot generalization and stability tests.
-* `docs/`: Project blueprint and technical reports.
-* `Archive/`: Historical scripts and notebooks.
+  * `ab_test_refusal.py`: **Critical** A/B test proving Refusal is a dynamical mode, not an artifact.
+  * `ab_test_comprehensive.py`: The Generalization Map experiments.
+* `docs/`: Technical reports and blueprints.
+  * **[EXECUTIVE SUMMARY](docs/reports/ALSI_SUMMARY.md):** Start here.
+  * `reports/The_Refusal_Bifurcation.md`: Deep dive into stability dynamics.
+  * `Why_Linear_Steering_Fails_in_SSMs.md`: Detailed negative results.
 
 ## Quick Start
 
-### Hardware Requirements
-
-* **CPU:** AMD Ryzen 5 PRO 4650U or equivalent (Minimum 16GB RAM). (Painfully slow but works!)
-* **GPU:** Optional but recommended for faster training (12GB VRAM).
-* **Runtime:** ~2 hours for the full pipeline on CPU.
-
 ### Reproducing Results
 
-1. Install dependencies:
+1. Install dependencies: `pip install -r requirements.txt`
+2. Run the full experimental pipeline: `python main.py --task all`
+3. Train Phi: `python main.py --task train_phi`
 
-```bash
-pip install -r requirements.txt
-```
+To generate plots locally: `ALSI_Plots.ipynb` (in Archive).
 
-2. Run the full experimental pipeline:
+### Hardware
 
-```bash
-python main.py --task all
-```
-
-3. Or run specific segments:
-
-```bash
-python main.py --task sensitivity    # Generates Sensitivity Curve
-python main.py --task failed_linear  # Reproduces PCA failures
-python main.py --task train_phi      # Trains the Phi Projector
-python main.py --task robustness     # Tests Zero-Shot & Refusal
-```
-
-To generate the initial plots locally without running the full pipeline, use: `ALSI_Plots.ipynb`.
+* Validated on AMD Ryzen 5 PRO (CPU-only execution supported but slow).
+* Recommended: 12GB+ VRAM GPU.

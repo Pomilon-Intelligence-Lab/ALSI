@@ -34,15 +34,19 @@ from tasks.verify_functional_mamba import VerifyFunctionalMamba
 from tasks.functional_optimization import FunctionalOptimization
 from tasks.stabilized_alsi import StabilizedALSI
 from tasks.functional_sensitivity_scan import FunctionalSensitivityScan
+from tasks.stabilized_alsi import StabilizedALSI
+from tasks.functional_sensitivity_scan import FunctionalSensitivityScan
 from tasks.distributed_injection_test import DistributedInjectionTest
 from tasks.smooth_injection_test import SmoothInjectionTest
+from tasks.transient_injection_test import TransientInjectionTest
+from tasks.shaping_optimization import ShapingOptimization
 from tasks.null_test import NullTest
 from tasks.failed_transition_pca import FailedTransitionPCA
 from tasks.failed_contrastive_pca import FailedContrastivePCA
 
 def main():
     parser = argparse.ArgumentParser(description="ALSI Experiment Runner")
-    parser.add_argument("--task", type=str, choices=["sensitivity", "train_phi", "train_phi_v2", "robustness", "robustness_psi", "robustness_psi_context", "ab_test_refusal", "ab_test_refusal_multitarget", "ab_test_comprehensive", "ab_test_v1_vs_v2", "direct_probe_test", "direct_probe_security_test", "direct_probe_correct_token", "debug_logits", "temperature_scan", "noise_test", "cache_alignment_test", "cache_fix", "inspect_cache", "manual_generate_loop", "manual_injection_test", "state_persistence_test", "reverse_engineer_cache", "verify_mock_equivalence", "verify_real_opt", "debug_cache", "identity_test", "inspect_config", "final_fix_opt", "inspect_model", "extract_mamba", "verify_functional", "functional_opt", "stabilized_alsi", "functional_sensitivity", "distributed_injection", "smooth_injection", "null_test", "failed_linear", "all"], default="all")
+    parser.add_argument("--task", type=str, choices=["sensitivity", "train_phi", "train_phi_v2", "robustness", "robustness_psi", "robustness_psi_context", "ab_test_refusal", "ab_test_refusal_multitarget", "ab_test_comprehensive", "ab_test_v1_vs_v2", "direct_probe_test", "direct_probe_security_test", "direct_probe_correct_token", "debug_logits", "temperature_scan", "noise_test", "cache_alignment_test", "cache_fix", "inspect_cache", "manual_generate_loop", "manual_injection_test", "state_persistence_test", "reverse_engineer_cache", "verify_mock_equivalence", "verify_real_opt", "debug_cache", "identity_test", "inspect_config", "final_fix_opt", "inspect_model", "extract_mamba", "verify_functional", "functional_opt", "stabilized_alsi", "functional_sensitivity", "distributed_injection", "smooth_injection", "transient_injection", "shaping_opt", "null_test", "failed_linear", "all"], default="all")
     args = parser.parse_args()
     
     tasks = []
@@ -123,6 +127,10 @@ def main():
         tasks.append(DistributedInjectionTest())
     if args.task == "smooth_injection":
         tasks.append(SmoothInjectionTest())
+    if args.task == "transient_injection":
+        tasks.append(TransientInjectionTest())
+    if args.task == "shaping_opt":
+        tasks.append(ShapingOptimization())
     if args.task == "null_test":
         tasks.append(NullTest())
         

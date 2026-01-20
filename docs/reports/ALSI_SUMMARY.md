@@ -45,9 +45,10 @@ We rigorously investigated why the model refuses injections. (See [`The_Refusal_
 8.  **[Stabilized ALSI Analysis](Stabilized_ALSI_Analysis.md):** Mapping the trade-off between control strength (Layer 23) and manifold stability (Layer 12).
 9.  **[Distributed Control Analysis](Distributed_Control_Analysis.md):** Proving that multi-layer injection reduces local state stress but requires multi-step objectives to prevent looping.
 10. **[Smooth Injection Analysis](Smooth_Injection_Analysis.md):** Demonstrating that depth-wise smoothing improves manifold resilience but confirms the "Sticky Attractor" problem.
-11. **[Why Linear Steering Fails](../Why_Linear_Steering_Fails_in_SSMs.md):** The negative results that motivated ALSI.
+11. **[Trajectory Shaping Success](Trajectory_Shaping_Success.md):** The final breakthrough: achieving non-looping, coherent steering via multi-step functional optimization.
+12. **[Why Linear Steering Fails](../Why_Linear_Steering_Fails_in_SSMs.md):** The negative results that motivated ALSI.
 
 ---
 
 **Final Status:**
-The project has successfully defined the **Phase Diagram of Latent Control** for SSMs and solved the engineering challenges of differentiable state injection. We have moved from "Does this work?" to "Here is the physics of how it fails and succeeds." The Autograd Blocker is resolved; ALSI is technically viable. The "Holy Grail" of perfect injection has been identified as a **Spatio-Temporal Tuning** problem: we must distribute the force across depth (Field) and time (Multi-step) to achieve coherent steering without looping.
+The project has successfully achieved **Coherent Latent Steering**. By implementing a functional Mamba recurrence and optimizing across spatio-temporal fields, we have solved the Engineering Blocker (Autograd), the Semantic Blocker (Refusal), and the Dynamical Blocker (Looping). ALSI is now a validated primitive for "Internalized RLM." The next phase is the construction of the **Phi-T Training Pipeline** to scale this control to arbitrary contexts.

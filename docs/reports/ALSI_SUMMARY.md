@@ -15,20 +15,17 @@ We successfully proved that while Mamba-2's recurrent state is resistant to line
 
 ## 2. The Journey of Falsification: From "Two Systems" to Cache Truth
 
-Early in the project, we observed that forcing a target token (e.g., "BLUE") often resulted in the model immediately outputting "I'm not sure" (a refusal). This led to the **Two-System Hypothesis**:
-1.  **System 1 (Logits):** We forced the next token.
-2.  **System 2 (Stability):** The model "rejected" the inconsistent state.
+Early in the project, we observed that forcing a target token often resulted in the model immediately outputting "I'm not sure" (a refusal). This led to the **Two-System Hypothesis** (documented in [`The_Refusal_Bifurcation.md`](reports/The_Refusal_Bifurcation.md)):
+1.  **System 1 (Logits):** We hijacked the immediate prediction.
+2.  **System 2 (Stability):** The model "rejected" the inconsistent state via a safety reflex.
 
-**The Correction:** Rigorous A/B testing and cache inspection revealed that this was a **technical artifact**. The "refusal" wasn't a safety mechanism, but a reaction to **Cache Misalignment**. When the Mamba-2 cache is manually modified without precise convolutional state alignment, the model's dynamics collapse into default fallback templates. Once we moved to a **Functional Mamba Step**, the model accepted the injections without refusal.
+**The Correction:** Rigorous A/B testing and cache inspection proved this was a **technical artifact**. The "refusal" was a symptom of **Cache Misalignment** (Logit Diff ~69.5) caused by improper manual state handling. Once we moved to a **Functional Mamba Step**, the model accepted the injections without refusal, proving that Mamba-2 does not inherently "fight" state grafting if the manifold integrity is maintained.
 
-## 3. The Refusal Artifact: A Lesson in Cache Alignment
-Initial results (see [`The_Refusal_Bifurcation.md`](reports/The_Refusal_Bifurcation.md)) showed consistent model refusal during injection.
+## 3. Technical Breakthroughs
 
-**Initial Interpretation:** Refusal is a dynamical signature of successful injection.
-**Final Finding:** Refusal is a symptom of **State Corruption**. 
-*   **The Artifact:** Manual cache modification without precise convolutional alignment scrambled the model's dynamics.
-*   **The Solution:** Functional Mamba Step + Custom Generation Loop.
-*   **Result:** By bypassing the stateful wrappers, we achieved **Rank 1 control without refusal**.
+1.  **Functional Recurrence:** We bypassed the stateful limitations of standard wrappers by re-implementing Mamba-2 as a pure function, enabling true end-to-end gradients.
+2.  **The Sweet Spot:** Identified **Layer 16** as the optimal depth for injection, where control authority and manifold stability are in balance.
+3.  **Trajectory Shaping:** Solved the "Sticky Attractor" problem (looping). By optimizing across multiple unrolled steps (BPTT), we achieved **Transient Injection**—forcing a token and then allowing the model to recover naturally.
 
 ## 4. The Artifacts
 

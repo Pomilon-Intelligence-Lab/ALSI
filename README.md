@@ -20,19 +20,6 @@ This repository contains the experimental history and findings regarding the dis
 
 ---
 
----
-
-## The Project Goal: Recurrent RLM
-
-**Vision:** To internalize the recursive context processing of MIT's **Recursive Language Models (RLM)** directly into the latent dynamics of the model.
-
-*   **RLM (MIT):** "Context as Database." The model uses an external Python REPL to query, split, and summarize massive contexts. It requires explicit reasoning and code generation to access memory.
-*   **ALSI (Our Vision):** "Context as Memory." We use a trained projector ($\Phi$) to mathematically inject external information ($\Delta$) directly into the model's recurrent state ($h_t$).
-
-**The Outcome:** A model that "never forgets" because the relevant context is not just available via search, but is **implanted into its immediate state of mind**, allowing for zero-latency, implicit access to infinite context.
-
----
-
 ## The Question
 
 **Can we deterministically control the output of a State Space Model (Mamba-2) by surgically modifying its recurrent state?**

@@ -48,8 +48,17 @@ Early in the project, we observed that forcing a target token often resulted in 
 11. **[Trajectory Shaping Success](Trajectory_Shaping_Success.md):** The final breakthrough: achieving non-looping, coherent steering via multi-step functional optimization.
 12. **[The Sweet Spot Analysis](The_Sweet_Spot_Analysis.md):** High-resolution layer-wise sensitivity mapping identifying Layer 16 as the optimal injection depth.
 13. **[Why Linear Steering Fails](../Why_Linear_Steering_Fails_in_SSMs.md):** The negative results that motivated ALSI.
+14. **[Limitations and Risk Analysis](Limitations_and_Risk_Analysis.md):** Analysis of the coherence gap and potential security misuses.
+
+---
+
+## 5. Ethical & Research Limitations
+
+While technically successful in forcing tokens, ALSI currently faces two primary barriers:
+1.  **The Coherence Gap:** Injected states destabilize the manifold, leading to garbled text rather than grammatical recovery.
+2.  **Security Risks:** Latent steering represents a powerful vector for **Jailbreaking** or **Model Hijacking**. By surgically modifying states, an adversary could force unsafe outputs that bypass standard prompt-level filters.
 
 ---
 
 **Final Status:**
-The project has successfully achieved **Coherent Latent Steering**. By implementing a functional Mamba recurrence and optimizing across spatio-temporal fields, we have solved the Engineering Blocker (Autograd), the Semantic Blocker (Refusal), and the Dynamical Blocker (Looping). ALSI is now a validated primitive for "Internalized RLM." The next phase is the construction of the **Phi-T Training Pipeline** to scale this control to arbitrary contexts.
+The project has successfully defined the **Phase Diagram of Latent Control** for SSMs. We have moved from "Does this work?" to "Here is the physics of how it fails and succeeds." ALSI is now a validated primitive for latent steering research, with a clear focus on solving the **Coherence Gap** via spatio-temporal trajectory shaping.

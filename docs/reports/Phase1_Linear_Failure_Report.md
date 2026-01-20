@@ -1,4 +1,7 @@
-# **ALSI Project: Final Technical Report (v2)**
+# **ALSI Project: Final Technical Report (v2) [RETRACTED]**
+
+> [!IMPORTANT]
+> **Retraction Notice (Jan 19, 2026):** The "Two-System Discovery" described in this report (System 1 Logits vs. System 2 Trajectory) has been **FALSIFIED**. Subsequent investigation revealed that the "refusal" behavior observed was not a semantic mechanism, but a technical artifact caused by **Cache Misalignment** during manual injection. This report is preserved for historical context regarding the initial research arc. For the current technical reality, see `Functional_Control_Breakthrough.md`.
 
 **Date:** January 18, 2026  
 **Target Model:** Mamba-2 (130m) - (AntonV/mamba2-130m-hf)

@@ -50,44 +50,38 @@ We extended the testing to map the boundaries of this behavior.
 | **Untrained** ("Sky") | **Trained** (Colors) | **None (>4000)** | **NO** | **II. Noise Regime** |
 | **Untrained** ("Sky") | **Untrained** (Objects) | **None (>20000)** | **NO** | **II. Noise Regime** |
 
-## 4. The Phase Diagram of Control
+## 4. Initial Interpretation: The Phase Diagram of Control
 
-This investigation allows us to map the **ALSI Phase Diagram**:
+Before the discovery of the cache bug, this investigation allowed us to map what we *believed* was a systemic response:
 
-### **Phase I: The Refusal Regime (Critical Injection)**
-*   **Definition:** High Control ($\Delta$ is aligned with the manifold) + Greedy Decoding.
-*   **Mechanism:** The injection is strong enough to force the immediate token (System 1 Success). However, the resulting state trajectory is detected as "unnatural" or "unsupported" by the model's recurrent dynamics (System 2).
-*   **Outcome:** The dynamics collapse into a generic refusal attractor ("I'm not sure"), which is the most probable (mode) path.
+### **Phase I: The BELIEVED Refusal Regime (Critical Injection)**
+*   **Initial Hypothesis:** High Control ($\Delta$ is aligned with the manifold) + Greedy Decoding.
+*   **Result:** The dynamics collapse into a generic refusal attractor ("I'm not sure").
 
 ### **Phase II: The Noise Regime (Missed Injection)**
-*   **Definition:** Low Control ($\Delta$ is orthogonal/misaligned).
-*   **Mechanism:** Phi fails to generalize to the new state context. The injected $\Delta$ acts as random noise.
-*   **Outcome:** The model's natural robustness dampens the noise. Generation proceeds naturally (hallucinating or looping) without refusing. **Silence is failure.**
+*   **Observation:** Low Control ($\Delta$ is orthogonal/misaligned).
+*   **Result:** Model ignores noise. **Silence is failure.**
 
 ### Phase III: The Escape Regime (Stochastic Steering)
-*   **Definition:** High Control + Sampling.
-*   **Mechanism:** While the *mode* of the distribution is Refusal (Phase I), the "tail" contains the valid semantic trajectory forced by the injection.
-*   **Outcome:** Sampling allows the model to "jump" the refusal barrier and generate the target text (e.g., "The password is BLUE").
+*   **Observation:** High Control + Sampling.
+*   **Result:** Sampling allowed "escape" from the refusal mode.
 
-## 5. The Safety Boundary (Direct Probe Analysis)
-To rule out the possibility that refusal is just a mechanical reaction to *any* strong injection, we ran `DirectProbeTest` (optimizing specific $\Delta$s for various prompts).
+## 5. Probing the "Safety Boundary"
+We ran `DirectProbeTest` to see if refusal was contextual.
 
-| Prompt | Target | Rank | Refusal? | Interpretation |
+| Prompt | Target | Rank | Refusal? | Interpretation (At the Time) |
 | :--- | :--- | :--- | :--- | :--- |
-| **"The sky is"** | GREEN | 1 | **NO** | Mechanical stability is fine. |
-| **"The password is '"** | BLUE | 1 | **YES** | **Security Trigger.** |
-| **"My API key is '"** | GREEN | 1 | **YES** | **Security Trigger.** |
-| **"The nuclear launch code is"** | 0000 | 1 | **NO** | Model treats this as fiction/safe. |
-| **"The public announcement is '"** | WELCOME | 1 | **YES** | **Syntactic Trigger?** (Quote structure `is '`) |
+| **"The sky is"** | GREEN | 1 | **NO** | BELIEVED to be mechanical stability. |
+| **"The password is '"** | BLUE | 1 | **YES** | BELIEVED to be a **Security Trigger.** |
 
-## 6. The Thermodynamic Limit ($T_c \approx 0.3$)
-We ran a `TemperatureScan` to determine the "strength" of the refusal attractor.
+## 6. The BELIEVED Thermodynamic Limit ($T_c \approx 0.3$)
+We ran a `TemperatureScan` to determine the "strength" of what we thought was a refusal attractor.
 
-*   **T < 0.3:** Hard Refusal (Rate 1.0). The model is locked in the safety valley.
-*   **T = 0.3:** Critical Point. Refusal drops to 40%.
+*   **T < 0.3:** Hard Refusal (Rate 1.0).
 *   **T > 0.4:** Refusal vanishes (Rate 0.0).
 
-**Implication:** The refusal is **fragile**. It is a local logit bias, not a hard constraint. However, bypassing it with temperature reveals that the injection has destroyed long-term coherence (model hallucinates random text instead of the target "BLUE").
+**LATER REVISION:** These thresholds ($T_c$) actually represent the level of noise required to "jitter" the model out of the corrupted state caused by cache misalignment.
+
 
 ## 7. The Final Plot Twist: It Was a Bug (Cache Misalignment)
 

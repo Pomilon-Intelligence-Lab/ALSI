@@ -20,6 +20,19 @@ This repository contains the experimental history and findings regarding the dis
 
 ---
 
+---
+
+## The Project Goal: Recurrent RLM
+
+**Vision:** To internalize the recursive context processing of MIT's **Recursive Language Models (RLM)** directly into the latent dynamics of the model.
+
+*   **RLM (MIT):** "Context as Database." The model uses an external Python REPL to query, split, and summarize massive contexts. It requires explicit reasoning and code generation to access memory.
+*   **ALSI (Our Vision):** "Context as Memory." We use a trained projector ($\Phi$) to mathematically inject external information ($\Delta$) directly into the model's recurrent state ($h_t$).
+
+**The Outcome:** A model that "never forgets" because the relevant context is not just available via search, but is **implanted into its immediate state of mind**, allowing for zero-latency, implicit access to infinite context.
+
+---
+
 ## The Question
 
 **Can we deterministically control the output of a State Space Model (Mamba-2) by surgically modifying its recurrent state?**
@@ -39,10 +52,11 @@ See `docs/Why_Linear_Steering_Fails_in_SSMs.md` for the technical breakdown.
 
 ## The Discovery
 
-Semantic control in Mamba-2 is **non-linear** and **off-manifold**.
+Semantic control in Mamba-2 is **non-linear**, **off-manifold**, and **functionally differentiable**.
 
 *   **Golden Delta:** For any target token, there exists a specific, high-magnitude state perturbation that forces the model to output it (Loss < 0.02).
-*   **The Phi Projector:** This non-linear mapping is learnable. We trained a simple MLP ($\Phi$) that projects `(Current State, Target Token)` $\rightarrow$ `Golden Delta`.
+*   **The Phi Projector:** This non-linear mapping is learnable. We proved that a recursive MLP ($\Phi$) can predict these deltas across multiple layers.
+*   **Functional Recurrence:** By reverse-engineering the Mamba-2 kernel into a pure functional step, we bypassed the stateful limitations of standard wrappers, enabling true end-to-end control.
 
 ## The New Primitive
 
@@ -81,6 +95,7 @@ ALSI treats monitoring as an evolving instrument rather than a single feature. T
 *   **Local Controllability:** The transition operator $A$ and $B$ matrices in Mamba allow for arbitrary next-token forcing if the state perturbation is precise enough.
 *   **The "Cache Alignment" Challenge:** The primary barrier to state injection is not semantic safety but **technical state management**. Manually modifying the Mamba-2 cache requires precise handling of convolutional and SSM states; even slight misalignments (Logit Diff > 60) cause the model to collapse into default fallback behaviors (refusal/hallucination).
 *   **Retraction of "Safety Reflex":** Earlier claims that the model actively "refuses" injections were proven to be artifacts of cache corruption.
+*   **Trajectory Shaping:** We solved the "looping problem" (`BLBLBL`) by moving from single-token forcing to **Multi-Step Optimization**. By explicitly penalizing token repetition during training, we achieved **Transient Latent Steering**—injections that turn on, flip the token, and then extinguish themselves to let the model recover naturally.
 
 ---
 
@@ -107,24 +122,27 @@ See `docs/reports/Functional_Control_Breakthrough.md` for details.
 ![Pareto Frontier](docs/images/pareto_frontier.png)
 *Control requires high-energy deltas (Y-axis) that fight the model's natural compression (X-axis).*
 
-### Generalization & Refusal
+### Generalization & Refusal (Historical Artifact)
 
 ![Robustness](docs/images/robustness_ranks.png)
-*Phi generalizes to semantic neighbors (PINK) but distant targets (CYAN) remain hard to steer. Trajectory generation often reveals the model "rejecting" the graft.*
+*Phi generalizes to semantic neighbors (PINK) but distant targets (CYAN) remain hard to steer. Early results showed the model "rejecting" the graft; this was later proven to be a **cache misalignment bug** rather than a semantic mechanism. Functional steering eliminates this refusal.*
 
 ---
 
 ## Repository Structure
 
-* `core/`: Shared infrastructure (Task base class, Phi model, Utils).
+* `core/`: Shared infrastructure.
+  * `functional_mamba.py`: Pure PyTorch differentiable Mamba-2 step.
+  * `phi_t.py`: The Trajectory-Aware Projector ($\Phi_T$).
 * `tasks/`: Implementation of specific experiments.
-  * `phi_training.py`: Phase 2 Ground truth generation and Phi Projector training.
-  * `ab_test_refusal.py`: **Critical** A/B test proving Refusal is a dynamical mode, not an artifact.
-  * `ab_test_comprehensive.py`: The Generalization Map experiments.
+  * `shaping_optimization.py`: **Final Breakthrough**: Multi-step BPTT for coherent control.
+  * `functional_sensitivity_scan.py`: High-resolution "Sweet Spot" analysis.
+  * `ab_test_refusal.py`: **Critical Diagnosis**: Proving refusal was a bug.
 * `docs/`: Technical reports and blueprints.
   * **[EXECUTIVE SUMMARY](docs/reports/ALSI_SUMMARY.md):** Start here.
-  * `reports/The_Refusal_Bifurcation.md`: Deep dive into stability dynamics.
-  * `Why_Linear_Steering_Fails_in_SSMs.md`: Detailed negative results.
+  * `reports/Trajectory_Shaping_Success.md`: Deep dive into non-looping control.
+  * `reports/Functional_Control_Breakthrough.md`: Solving the Autograd blocker.
+  * `reports/Phase1_Linear_Failure_Report.md`: Early research history.
 
 ## Quick Start
 

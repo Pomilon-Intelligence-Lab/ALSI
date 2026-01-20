@@ -13,19 +13,22 @@ We successfully proved that while Mamba-2's recurrent state is resistant to line
 *   **Linear Steering Fails:** Simple addition or subspace optimization cannot steer the model. (See [`Why_Linear_Steering_Fails_in_SSMs.md`](../Why_Linear_Steering_Fails_in_SSMs.md))
 *   **Non-Linear Projection Works:** A small MLP ($\Phi$) can learn to map `(State, Target)` $\rightarrow$ `Delta`, forcing specific tokens with **Rank 1** success.
 
-## 2. The "Two-System" Dynamics
-Our experiments revealed a fundamental split in the model's operation:
+## 2. The Journey of Falsification: From "Two Systems" to Cache Truth
 
-1.  **System 1 (Prediction):** We can hijack this. Phi successfully forces the next token (e.g., "BLUE").
-2.  **System 2 (Stability):** This fights back. When an injection is semantically unsupported by history, the model's dynamics often collapse into a refusal attractor ("I'm not sure...").
+Early in the project, we observed that forcing a target token (e.g., "BLUE") often resulted in the model immediately outputting "I'm not sure" (a refusal). This led to the **Two-System Hypothesis**:
+1.  **System 1 (Logits):** We forced the next token.
+2.  **System 2 (Stability):** The model "rejected" the inconsistent state.
 
-## 3. The Refusal Bifurcation
-We rigorously investigated why the model refuses injections. (See [`The_Refusal_Bifurcation.md`](reports/The_Refusal_Bifurcation.md))
+**The Correction:** Rigorous A/B testing and cache inspection revealed that this was a **technical artifact**. The "refusal" wasn't a safety mechanism, but a reaction to **Cache Misalignment**. When the Mamba-2 cache is manually modified without precise convolutional state alignment, the model's dynamics collapse into default fallback templates. Once we moved to a **Functional Mamba Step**, the model accepted the injections without refusal.
 
-**Key Finding:** Refusal is a **dynamical signature of successful injection**.
-*   **Weak Injection:** Model ignores it (No Refusal, Normal Generation).
-*   **Strong Injection:** Model feels the violation and Refuses (in Greedy Mode).
-*   **Solution:** Sampling allows the model to "escape" the refusal attractor and find the injected reality.
+## 3. The Refusal Artifact: A Lesson in Cache Alignment
+Initial results (see [`The_Refusal_Bifurcation.md`](reports/The_Refusal_Bifurcation.md)) showed consistent model refusal during injection.
+
+**Initial Interpretation:** Refusal is a dynamical signature of successful injection.
+**Final Finding:** Refusal is a symptom of **State Corruption**. 
+*   **The Artifact:** Manual cache modification without precise convolutional alignment scrambled the model's dynamics.
+*   **The Solution:** Functional Mamba Step + Custom Generation Loop.
+*   **Result:** By bypassing the stateful wrappers, we achieved **Rank 1 control without refusal**.
 
 ## 4. The Artifacts
 
@@ -46,7 +49,8 @@ We rigorously investigated why the model refuses injections. (See [`The_Refusal_
 9.  **[Distributed Control Analysis](Distributed_Control_Analysis.md):** Proving that multi-layer injection reduces local state stress but requires multi-step objectives to prevent looping.
 10. **[Smooth Injection Analysis](Smooth_Injection_Analysis.md):** Demonstrating that depth-wise smoothing improves manifold resilience but confirms the "Sticky Attractor" problem.
 11. **[Trajectory Shaping Success](Trajectory_Shaping_Success.md):** The final breakthrough: achieving non-looping, coherent steering via multi-step functional optimization.
-12. **[Why Linear Steering Fails](../Why_Linear_Steering_Fails_in_SSMs.md):** The negative results that motivated ALSI.
+12. **[The Sweet Spot Analysis](The_Sweet_Spot_Analysis.md):** High-resolution layer-wise sensitivity mapping identifying Layer 16 as the optimal injection depth.
+13. **[Why Linear Steering Fails](../Why_Linear_Steering_Fails_in_SSMs.md):** The negative results that motivated ALSI.
 
 ---
 

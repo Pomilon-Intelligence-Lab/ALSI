@@ -2,7 +2,12 @@ import torch
 
 class MockCache:
     """
-    A helper class to wrap SSM states for Mamba2 forward passes.
+    [DEPRECATED/WARNING] A helper class to wrap SSM states.
+    
+    🚩 WARNING: Investigation via VerifyMockEquivalence proves this class causes 
+    catastrophic logit divergence (~69.5) compared to native Mamba2Cache.
+    DO NOT USE for steering research. Use `functional_mamba_step` in core/ instead.
+    
     Compatible with transformers.models.mamba2.modeling_mamba2
     """
     def __init__(self, ssm_states, conv_states, config):

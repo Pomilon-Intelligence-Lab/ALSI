@@ -1,4 +1,4 @@
-# The Sweet Spot Analysis: Identifying Optimal Injection Depth
+# The Sweet Spot Analysis [PHASE 1]
 
 **Date:** January 19, 2026
 **Subject:** High-Resolution Functional Sensitivity Scan of Mamba-2 (130m)

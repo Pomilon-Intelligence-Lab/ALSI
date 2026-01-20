@@ -1,4 +1,4 @@
-# Functional Control Breakthrough: Solving the Autograd Blocker
+# Functional Control Breakthrough [PHASE 1]
 
 **Date:** January 19, 2026
 **Subject:** Successful implementation of Differentiable State Injection via Functional Mamba Kernels

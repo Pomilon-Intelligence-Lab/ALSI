@@ -1,4 +1,4 @@
-# Stabilized ALSI Analysis: The Control-Stability Trade-off
+# Stabilized ALSI Analysis [PHASE 1]
 
 **Date:** January 19, 2026
 **Subject:** Investigation into Early-Layer Injection and KL-Divergence Regularization for Trajectory Coherence

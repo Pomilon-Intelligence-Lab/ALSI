@@ -1,4 +1,4 @@
-# Distributed Control Analysis: Field Perturbation vs. Impulse
+# Distributed Control Analysis [PHASE 1]
 
 **Date:** January 19, 2026
 **Subject:** Investigation into Multi-Layer State Injection to mitigate manifold breakage.

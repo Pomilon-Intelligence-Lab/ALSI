@@ -1,4 +1,4 @@
-# Analysis of Phi Scaling Attempt (V2)
+# Phi Scaling Attempt Analysis [PHASE 1]
 
 **Date:** January 19, 2026
 **Objective:** Test if training Phi on a diverse prompt distribution ("Phi-v2") eliminates the "Refusal Bifurcation" observed in the narrow Phi-v1 model.

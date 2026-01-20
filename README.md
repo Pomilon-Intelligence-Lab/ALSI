@@ -1,97 +1,62 @@
-# Augmented Latent State Injection (ALSI)
+# ALSI: First Steps Toward Semantic Memory Injection
+
+> **"Establishing Controllability in Mamba-2 Recurrent States"**
 
 > [!CAUTION]
-> **Research Artifact Disclaimer**: This repository documents exploratory research into Mamba-2 state dynamics. It is a **technical feasibility study** demonstrating single-token latent steering. It is **not** a production-ready framework, a memory system, or a finished product.
-
-> **"Logit control ≠ trajectory control"**
-
-ALSI investigates whether Mamba-2 State Space Models can be steered via learned non-linear latent perturbations. We prove that while the recurrent state is a differentiable control surface, achieving coherent, multi-step steering remains a significant research challenge.
+> **Research Artifact Disclaimer**: This repository documents exploratory research into Mamba-2 state dynamics. It is a **Phase 1: Technical Feasibility Study**. It is **not** a production-ready framework or a functional memory system.
 
 ---
 
-## Current Status: Phase 1 (Technical Feasibility)
+## 🎯 The Vision: Internalized RLM
+The long-term goal of ALSI is to internalize the context processing of MIT's **Recursive Language Models (RLM)** directly into the latent dynamics of State Space Models.
 
-We have successfully built the **engineering foundation** for latent steering in SSMs, but the system is currently limited to **single-token forcing**. 
-
-### What has been proven:
-*   ✅ **SSM states are controllable** via off-manifold, non-linear perturbations (where linear methods fail).
-*   ✅ **Functional differentiation is required** to bypass stateful cache limitations in standard model wrappers.
-*   ✅ **Target tokens can be forced** with Rank 1 accuracy across various contexts.
-
-### What is NOT yet proven:
-*   ❌ **Trajectory Coherence:** Steering a token currently results in garbled/hallucinatory continuations.
-*   ❌ **Semantic Fact Injection:** We have not yet demonstrated that injections can encode meaningful facts (e.g., memory recall) beyond statistical logit bias.
+*   **The Dream:** A model that mathematically "uploads" external facts into its recurrent state ($h_t$), allowing it to process unbounded context with zero-latency implicit recall.
+*   **The Reality:** We are currently at the **infrastructure layer**, proving that such steering is physically and mathematically possible.
 
 ---
 
-## The Long-Term Vision: Recurrent RLM
+## 🔬 Current Reality: Phase 1 Complete
+We have established the foundational capabilities required for latent steering. 
 
-ALSI was inspired by the goal of internalizing the recursive context processing of MIT's **Recursive Language Models (RLM)**.
+### ✅ What Works (Foundations)
+*   **Controllability Proof:** SSM states are controllable via non-linear, off-manifold perturbations (linear methods like PCA fail).
+*   **Functional Engine:** A custom differentiable Mamba-2 implementation that bypasses stateful cache limitations.
+*   **Token Forcing:** A trained projector ($\Phi$) can force target tokens with Rank 1 accuracy.
 
-*   **The Idea:** To move from "Context as an external database" (RLM) to "Context as internal latent memory" (ALSI).
-*   **The Goal:** A system where external facts are projected directly into the model's state, allowing it to "remember" forgotten context without re-prompting.
-
-See `docs/vision.md` for the roadmap from our current "Token Forcer" to this ultimate goal.
-
-## Key Breakthroughs
-
-*   **Functional Recurrence:** A pure PyTorch implementation of the Mamba-2 step, enabling backpropagation through time (BPTT) for state optimization.
-*   **Spatio-Temporal Mapping:** Discovery of the "Phase Diagram" of control stability and identifying Layer 16 as the optimal steering depth.
-*   **Loop Mitigation:** Proving that multi-step objectives can break the "Sticky Attractor" limit cycles.
+### ❌ What Doesn't Work Yet (The Research Frontier)
+*   **Coherence:** Model output often becomes garbled after the forced token (The Coherence Gap).
+*   **Semantic Encoding:** We can force a specific token (e.g., "BLUE") but haven't yet proven we can inject a factual statement (e.g., "John lives in Paris").
+*   **Memory Validation:** No experiments have been conducted on long-range recall or QA tasks.
 
 ---
 
-## Limitations & Risks
+## 🛤️ The Roadmap: Baby Steps to the Vision
 
-*   ❌ **No Coherent Generation:** Injected states currently result in garbled fallbacks or hallucinations after the forced token.
-*   ❌ **Context Sensitivity:** The current Phi projector is highly sensitive to the initial prompt manifold.
-*   ⚠️ **Security Risk:** This technique, if scaled, represents a potential vector for model hijacking or jailbreaking. See `docs/reports/Limitations_and_Risk_Analysis.md`.
-
-## Key Visualizations
-
-### The Failure of Linearity vs. The Success of Phi
-
-![Sensitivity Curve](docs/images/sensitivity_curve.png)
-*Naive linear addition (blue/flat) does nothing. The Phi Projector (learning curve, see full report) successfully finds the control surface.*
-
-### The Cost of Control
-
-![Pareto Frontier](docs/images/pareto_frontier.png)
-*Control requires high-energy deltas (Y-axis) that fight the model's natural compression (X-axis).*
-
-### Generalization & Refusal (Historical Artifact)
-
-![Robustness](docs/images/robustness_ranks.png)
-*Phi generalizes to semantic neighbors (PINK) but distant targets (CYAN) remain hard to steer. Early results showed the model "rejecting" the graft; this was later proven to be a **cache misalignment bug** rather than a semantic mechanism. Functional steering eliminates this refusal.*
+| Phase | Milestone | Status |
+| :--- | :--- | :--- |
+| **Phase 1: Token Control** | Prove states are differentiable and controllable. | **COMPLETE** ✅ |
+| **Phase 2: Fact Injection** | Inject semantic facts and verify recall in QA tasks. | *PLANNED* 🔄 |
+| **Phase 3: Multi-Hop Reasoning** | Inject multiple compositional facts simultaneously. | *CONCEPTUAL* 🔮 |
+| **Phase 4: Continuous Memory** | Rolling latent injection in long-range conversations. | *CONCEPTUAL* 🔮 |
+| **Phase 5: RLM Parity** | Match/Exceed RLM performance on long-context benchmarks. | *CONCEPTUAL* 🔮 |
 
 ---
 
-## Repository Structure
+## Repository Navigation
 
-* `core/`: Shared infrastructure.
-  * `functional_mamba.py`: Pure PyTorch differentiable Mamba-2 step.
-  * `phi_t.py`: The Trajectory-Aware Projector ($\Phi_T$).
-* `tasks/`: Implementation of specific experiments.
-  * `shaping_optimization.py`: **Final Breakthrough**: Multi-step BPTT for coherent control.
-  * `functional_sensitivity_scan.py`: High-resolution "Sweet Spot" analysis.
-  * `ab_test_refusal.py`: **Critical Diagnosis**: Proving refusal was a bug.
-* `docs/`: Technical reports and blueprints.
-  * **[EXECUTIVE SUMMARY](docs/reports/ALSI_SUMMARY.md):** Start here.
-  * `reports/Trajectory_Shaping_Success.md`: Deep dive into non-looping control.
-  * `reports/Functional_Control_Breakthrough.md`: Solving the Autograd blocker.
-  * `reports/Phase1_Linear_Failure_Report.md`: Early research history.
+### Core Foundations [Phase 1]
+*   `core/functional_mamba.py`: Differentiable Mamba-2 recurrence.
+*   `core/phi_t.py`: Recursive Trajectory Projector.
+
+### Technical Reports
+1.  **[EXECUTIVE SUMMARY](docs/reports/ALSI_SUMMARY.md):** Start here for the high-level research arc.
+2.  **[The Vision](docs/VISION.md):** The original spark and core hypothesis.
+3.  **[Current State](docs/CURRENT_STATE.md):** Detailed breakdown of Phase 1 results.
+4.  **[Roadmap](docs/ROADMAP.md):** Immediate experiments to close the gap.
+
+---
 
 ## Quick Start
-
-### Reproducing Results
-
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run the full experimental pipeline: `python main.py --task all`
-3. Train Phi: `python main.py --task train_phi`
-
-To generate plots locally: `ALSI_Plots.ipynb` (in Archive).
-
-### Hardware
-
-* Validated on AMD Ryzen 5 PRO (CPU-only execution supported but slow).
-* Recommended: 12GB+ VRAM GPU.
+1.  `pip install -r requirements.txt`
+2.  Run Phase 1 validation: `python main.py --phase 1-token-control`
+3.  View negative results: `docs/Why_Linear_Steering_Fails_in_SSMs.md`

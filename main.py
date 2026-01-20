@@ -1,5 +1,7 @@
 import argparse
+import sys
 from tasks.sensitivity import SensitivityScan
+# ... (rest of imports)
 from tasks.phi_training import PhiTraining
 from tasks.phi_training_v2 import PhiTrainingV2
 from tasks.robustness import RobustnessTest
@@ -49,10 +51,20 @@ from tasks.failed_contrastive_pca import FailedContrastivePCA
 def main():
     parser = argparse.ArgumentParser(description="ALSI Experiment Runner")
     parser.add_argument("--task", type=str, choices=["sensitivity", "train_phi", "train_phi_v2", "robustness", "robustness_psi", "robustness_psi_context", "ab_test_refusal", "ab_test_refusal_multitarget", "ab_test_comprehensive", "ab_test_v1_vs_v2", "direct_probe_test", "direct_probe_security_test", "direct_probe_correct_token", "debug_logits", "temperature_scan", "noise_test", "cache_alignment_test", "cache_fix", "inspect_cache", "manual_generate_loop", "manual_injection_test", "state_persistence_test", "reverse_engineer_cache", "verify_mock_equivalence", "verify_real_opt", "debug_cache", "identity_test", "inspect_config", "final_fix_opt", "inspect_model", "extract_mamba", "verify_functional", "functional_opt", "stabilized_alsi", "functional_sensitivity", "distributed_injection", "smooth_injection", "transient_injection", "shaping_opt", "gen_phi_t_data", "train_phi_t", "null_test", "failed_linear", "all"], default="all")
+    parser.add_argument("--phase", type=str, choices=["1-token-control", "2-fact-injection"], help="Run tasks associated with a specific research phase")
     args = parser.parse_args()
     
     tasks = []
-    if args.task == "sensitivity" or args.task == "all":
+    if args.phase == "1-token-control":
+        print("\n=== Phase 1: Establishing Controllability ===")
+        print("Running foundations... (Sensitivity -> Phi V1 -> Functional Opt -> Shaping)")
+        tasks = [SensitivityScan(), PhiTraining(), FunctionalOptimization(), ShapingOptimization()]
+    elif args.phase == "2-fact-injection":
+        print("\n=== Phase 2: Fact Injection ===")
+        print("Status: NOT IMPLEMENTED YET")
+        print("See docs/ROADMAP.md for planned experiments.")
+        sys.exit(0)
+    elif args.task == "sensitivity" or args.task == "all":
         tasks.append(SensitivityScan())
     if args.task == "failed_linear" or args.task == "all":
         tasks.append(FailedTransitionPCA())

@@ -1,4 +1,4 @@
-# The Refusal Bifurcation: A Phase Diagram of Latent Control
+# The Refusal Bifurcation [PHASE 1]
 
 **Date:** January 19, 2026
 **Subject:** Investigation into Systemic Refusal Modes in Mamba-2 during State Injection

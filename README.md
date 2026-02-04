@@ -8,7 +8,7 @@
 
 > [!WARNING]
 > **SECURITY ALERT: SCAM REPOSITORIES**
-> It has come to our attention that several malicious forks and clones (e.g., `AnagamiZz/ALSI`) are circulating. These repositories use SEO-bait tags (like "motor control" or "csharp") and fake READMEs to trick users into downloading "installers" or "executables."
+> It has come to our attention that several malicious forks and clones (e.g., `AnagamiZz/ALSI`, `Pratham-Bhayana/ALSI`) are circulating. These repositories use SEO-bait tags (like "motor control" or "csharp") and fake READMEs to trick users into downloading "installers" or "executables."
 > **ALSI is a Python research project.**
 > * There is **NO** `.exe`, `.dmg`, or "Installer" for ALSI.
 > * There is **NO** "User Interface" or "Application" version.

@@ -4,6 +4,17 @@
 
 > [!CAUTION]
 > **Research Artifact Disclaimer**: This repository documents exploratory research into Mamba-2 state dynamics. It is a **Phase 1: Technical Feasibility Study**. It is **not** a production-ready framework or a functional memory system.
+> 
+> [!WARNING]
+> **SECURITY ALERT: SCAM REPOSITORIES**
+> It has come to our attention that several malicious forks and clones (e.g., `AnagamiZz/ALSI`) are circulating. These repositories use SEO-bait tags (like "motor control" or "csharp") and fake READMEs to trick users into downloading "installers" or "executables."
+> **ALSI is a Python research project.**
+> * There is **NO** `.exe`, `.dmg`, or "Installer" for ALSI.
+> * There is **NO** "User Interface" or "Application" version.
+> * Official research code is only hosted here: [github.com/Pomilon-Intelligence-Lab/ALSI](https://github.com/Pomilon-Intelligence-Lab/ALSI).
+> 
+> 
+> If you encounter a version of ALSI asking you to "Visit the Releases page to download," **do not run the file.** It is likely malware.
 
 ---
 
